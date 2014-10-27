@@ -18,9 +18,12 @@ import time
  
 # Loop over each line in a open file
 for f_lines in open('sites','r').readlines():
-''' '''
- 
-''' 
+  f_lines = f_lines.replace("http://","")	# remove http:// from url 
+  f_lines = f_lines.replace("https://","")	# remove https:// from url 
+  f_lines = f_lines.replace("www.","")		# remove www. from url
+  f_lines = (f_lines).split('/')[0]			# remove everything after domain
+  print f_lines 
+  
   HOST = f_lines.rstrip()					# strip '\n' from each line
   print "QUERY: %s" % HOST
   p = subprocess.Popen(['whois %s' % (str(HOST))], shell=True, stdout=subprocess.PIPE)
@@ -57,4 +60,3 @@ for f_lines in open('sites','r').readlines():
 
   print "\n------SLEEPING 5 sec-------------\n"
   time.sleep(5)			# sleep required otherwise new query cant be spawned
-'''
