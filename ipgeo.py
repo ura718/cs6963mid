@@ -1,6 +1,8 @@
 #!/usr/bin/python
 
 #
+# Author: Yuri Medvinsky
+#
 # This code was tested on RedHat6.5
 # Requirements
 # 	jwhois 		= rpm linux
@@ -8,14 +10,18 @@
 #
 
 
-import socket
+import argparse
 import subprocess
-import re
+import socket
 import time
+import sys
+import re
 
 
  
 def WHOIS():
+
+
  
   # Loop over each line in a open file
   for f_lines in open('sites','r').readlines():
@@ -26,13 +32,11 @@ def WHOIS():
     f_lines = f_lines.replace("www.","")		# remove www. from url
     f_lines = (f_lines).split('/')[0]			# remove everything after domain
     f_lines = f_lines.strip('\n')				# remove newline
-    #print f_lines
 
 
 
     # GET IP FROM HOSTNAME 
     IP = socket.gethostbyname(f_lines)		# get hostname ip address
-    #print IP
 
 
 
@@ -79,7 +83,35 @@ def WHOIS():
 
 
 def main():
-  WHOIS() 
+  # Help Menu
+  parser = argparse.ArgumentParser()
+  parser.add_argument('-r', help='Create Report File')
+  parser.add_argument('-d', help='Create SQL DB')
+  args=parser.parse_args()
+
+  if args.r == None:
+	print '[-] Creating Reports File'
+  elif args.r:
+    print '[+] Creating Reports File'
+		
+  if args.d == None:
+  	print '[-] Creating SQL DB'
+  elif args.d:
+  	print '[+] Creating SQL DB'
+
+
+
+  
+  # DOES SITES URL FILE EXISTS?
+  try: 
+    f = open('sites','r')
+    WHOIS() 
+  except IOError, e:
+ 	print 'No File Found. Please provide sites file with urls '
+	exit(1)
+  else:
+    f.close()
+
 
 
 
