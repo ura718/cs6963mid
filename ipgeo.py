@@ -11,6 +11,7 @@
 
 
 import argparse
+import urllib2
 import subprocess
 import socket
 import time
@@ -18,11 +19,9 @@ import sys
 import re
 
 
- 
-def WHOIS():
 
-
- 
+def DOMAIN():
+  domain=[]
   # Loop over each line in a open file
   for f_lines in open('sites','r').readlines():
 
@@ -33,21 +32,24 @@ def WHOIS():
     f_lines = (f_lines).split('/')[0]			# remove everything after domain
     f_lines = '.'.join((f_lines).split('.')[-2:]) # remove subdomains and take last 2 elements only
     f_lines = f_lines.strip('\n')				# remove newline
+    domain.append(f_lines)
+
+  return (domain)
 
 
 
-    # GET IP FROM HOSTNAME 
-    IP = socket.gethostbyname(f_lines)		# get hostname ip address
 
-
+ 
+def WHOIS(dnsname):
+  # Loop over each line in dns names
+  for f_lines in dnsname:
 
     # RUN SHELL COMMAND TO QUERY WHOIS DB 
     HOST = f_lines
-    print "QUERY: %s : %s" % (HOST,IP)
+    print "QUERY: %s " % (HOST)
     p = subprocess.Popen(['whois %s' % (str(HOST))], shell=True, stdout=subprocess.PIPE)
     output, err = p.communicate()
     output = output.split('\n')				# split each line of string output by '\n'
-
 
 
     # EXTRACT SPECIFIC INFORMATION FROM WHOIS OUTPUT 
@@ -71,7 +73,6 @@ def WHOIS():
 	    info.append(o_lines)
 
 
-
     # SHOW END RESULT FROM WHOIS OUTPUT
     for i_lines in (info):
   	  print i_lines
@@ -79,6 +80,34 @@ def WHOIS():
 
     print "\n------SLEEPING 5 sec-------------\n"
     time.sleep(5)			# sleep required otherwise new query cant be spawned
+
+
+
+
+
+def IPDNS(dnsname):
+  # Loop over each line in a open file
+  for f_lines in dnsname:
+
+    # GET IP FROM HOSTNAME 
+    IP = socket.gethostbyname(f_lines)		# get hostname ip address
+    print "%s : %s " % (f_lines,IP)
+
+
+
+
+def URLHEADER():
+  for f_lines in open('sites','r').readlines():
+    f_lines = f_lines.rstrip()
+    print f_lines
+    try:
+      response = urllib2.urlopen(f_lines, timeout=10)
+      print response.info()
+      response.close()
+    except urllib2.URLError, e:
+      print "There was an error in reading url header: %s" % e
+
+
 
 
 
@@ -106,7 +135,10 @@ def main():
   # DOES SITES FILE EXISTS?
   try: 
     f = open('sites','r')
-    WHOIS() 
+    dnsname = DOMAIN()
+    #WHOIS(dnsname) 
+    #IPDNS(dnsname)
+    URLHEADER()
   except IOError, e:
  	print 'No File Found. Please provide sites file with urls '
 	exit(1)
