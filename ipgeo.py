@@ -5,7 +5,7 @@
 #
 # This code was tested on RedHat6.5
 # Requirements
-# 	jwhois 		= rpm linux
+# 	jwhois 		= rpm linux (jwhois-4.0-19.el6.x86_64)
 #	subprocess	= python module 
 #
 
@@ -31,6 +31,7 @@ def WHOIS():
     f_lines = f_lines.replace("https://","")	# remove https:// from url 
     f_lines = f_lines.replace("www.","")		# remove www. from url
     f_lines = (f_lines).split('/')[0]			# remove everything after domain
+    f_lines = '.'.join((f_lines).split('.')[-2:]) # remove subdomains and take last 2 elements only
     f_lines = f_lines.strip('\n')				# remove newline
 
 
@@ -102,7 +103,7 @@ def main():
 
 
   
-  # DOES SITES URL FILE EXISTS?
+  # DOES SITES FILE EXISTS?
   try: 
     f = open('sites','r')
     WHOIS() 
