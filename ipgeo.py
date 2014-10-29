@@ -2,6 +2,7 @@
 
 #
 # Author: Yuri Medvinsky
+# cs6963 - midterm
 #
 # This code was tested on RedHat6.5
 # Requirements
@@ -19,7 +20,36 @@ import socket
 import time
 import sys
 import re
+import os
 from geoip import geolite2
+
+
+
+
+
+def CHECK_FILES():
+
+  # We need a sites file with all the urls. Does it exist?...
+  try: 
+    f = open('sites','r')
+  except IOError, e:
+ 	print 'File Not Found: Please provide sites file with urls '
+	exit(1)
+  else:
+    f.close()
+
+
+  # Does reports.txt exist? If so delete it...
+  try:
+    fo = open('report.txt', 'r')      
+    if fo:
+      os.remove('report.txt')
+    fo.close()
+  except IOError, e:
+    pass
+
+
+
 
 
 def DOMAIN():
@@ -89,7 +119,7 @@ def WHOIS(dnsname):
 
 def IPDNS(dnsname):
   ipaddr = []								# create empty array
-  # Loop over each line in a open file
+  # Loop over each item in dnsnames
   for f_lines in dnsname:
 
     # GET IP FROM HOSTNAME 
@@ -149,20 +179,15 @@ def main():
 
 
 
+  CHECK_FILES()				# Check all necessary files exist before running program
+  dnsname = DOMAIN()		# strip urls and only get domain name (e.g: example.com)
+  #WHOIS(dnsname) 			# run whois against domain name
+  ipaddr=IPDNS(dnsname)		# return ip addresses
+  #URLHEADER()				# get header for each url link 
+  #GEOIP(ipaddr)				# get geo location against each url link
+
+
   
-  # DOES SITES FILE EXISTS?
-  try: 
-    f = open('sites','r')
-    dnsname = DOMAIN()
-    #WHOIS(dnsname) 
-    ipaddr=IPDNS(dnsname)
-    #URLHEADER()
-    GEOIP(ipaddr)
-  except IOError, e:
- 	print 'No File Found. Please provide sites file with urls '
-	exit(1)
-  else:
-    f.close()
 
 
 
