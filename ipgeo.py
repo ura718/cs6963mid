@@ -6,8 +6,10 @@
 # This code was tested on RedHat6.5
 # Requirements
 # 	jwhois 		= rpm linux (jwhois-4.0-19.el6.x86_64)
-#	subprocess	= python module 
 #
+#   http://pythonhosted.org/python-geoip/
+#   install module python-geoip-geolite2
+#   install module python-geoip
 
 
 import argparse
@@ -17,7 +19,7 @@ import socket
 import time
 import sys
 import re
-
+from geoip import geolite2
 
 
 def DOMAIN():
@@ -86,14 +88,16 @@ def WHOIS(dnsname):
 
 
 def IPDNS(dnsname):
+  ipaddr = []								# create empty array
   # Loop over each line in a open file
   for f_lines in dnsname:
 
     # GET IP FROM HOSTNAME 
     IP = socket.gethostbyname(f_lines)		# get hostname ip address
+    ipaddr.append(IP)
     print "%s : %s " % (f_lines,IP)
 
-
+  return ipaddr
 
 
 def URLHEADER():
@@ -108,6 +112,20 @@ def URLHEADER():
       print "There was an error in reading url header: %s" % e
 
 
+
+
+def GEOIP(ipaddr):
+  for ip in ipaddr:
+	match = geolite2.lookup(ip)
+	print match.ip					# ip address
+	print match.country				# country code as ISO
+	print match.continent			# continent code as ISO
+	print match.timezone			# timezone if available as tzinfo name
+	print match.subdivisions		# list of ISO codes as immutable set
+	print match.location			# latitude and longitude tuples
+	print '\n'
+
+  
 
 
 
@@ -137,8 +155,9 @@ def main():
     f = open('sites','r')
     dnsname = DOMAIN()
     #WHOIS(dnsname) 
-    #IPDNS(dnsname)
-    URLHEADER()
+    ipaddr=IPDNS(dnsname)
+    #URLHEADER()
+    GEOIP(ipaddr)
   except IOError, e:
  	print 'No File Found. Please provide sites file with urls '
 	exit(1)
