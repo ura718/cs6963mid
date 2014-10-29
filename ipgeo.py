@@ -27,7 +27,17 @@ from geoip import geolite2
 
 
 
-def CHECK_FILES():
+def CHECK_FILES(f_report):
+
+  # Dont use script name to create reports
+  if os.path.basename(__file__) == f_report:
+    print "Error: Cant use running script as name for reports. Pick different name"    
+    exit(1)
+
+  # Dont use sites url file to create reports
+  if 'sites' == f_report:
+    print "Error: Cant use sites as name for report creation. Pick a different name" 
+    exit(1)
 
   # We need a sites file with all the urls. Does it exist?...
   try: 
@@ -38,12 +48,11 @@ def CHECK_FILES():
   else:
     f.close()
 
-
-  # Does reports.txt exist? If so delete it...
+  # Does reports exist? If so delete it...
   try:
-    fo = open('report.txt', 'r')      
+    fo = open(f_report, 'r')      
     if fo:
-      os.remove('report.txt')
+      os.remove(f_report)
     fo.close()
   except IOError, e:
     pass
@@ -170,21 +179,25 @@ def main():
   if args.r == None:
 	print '[-] Creating Reports File'
   elif args.r:
-    print '[+] Creating Reports File'
-		
+    f_report = args.r
+    print '[+] Creating Reports File: %s' % f_report
+    CHECK_FILES(f_report)				# Check if url site file exists. And remove any old report file
+
+
   if args.d == None:
   	print '[-] Creating SQL DB'
   elif args.d:
-  	print '[+] Creating SQL DB'
+    print '[+] Creating SQL DB:' 
 
 
-
+  '''
   CHECK_FILES()				# Check all necessary files exist before running program
   dnsname = DOMAIN()		# strip urls and only get domain name (e.g: example.com)
   #WHOIS(dnsname) 			# run whois against domain name
   ipaddr=IPDNS(dnsname)		# return ip addresses
   #URLHEADER()				# get header for each url link 
   #GEOIP(ipaddr)				# get geo location against each url link
+  '''
 
 
   
