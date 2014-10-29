@@ -39,6 +39,8 @@ def CHECK_FILES(f_report):
     print "Error: Cant use sites as name for report creation. Pick a different name" 
     exit(1)
 
+
+
   # We need a sites file with all the urls. Does it exist?...
   try: 
     f = open('sites','r')
@@ -47,6 +49,7 @@ def CHECK_FILES(f_report):
 	exit(1)
   else:
     f.close()
+
 
   # Does reports exist? If so delete it...
   try:
@@ -82,9 +85,13 @@ def DOMAIN():
 
  
 def WHOIS(dnsname):
+  i_whois=[] 	# use to store incomplete 'whois' information (e.g: excludes banners)
+  a_whois=[]	# use to store all 'whois' information (e.g: includes banners and everything)
+
+
+
   # Loop over each line in dns names
   for f_lines in dnsname:
-
     # RUN SHELL COMMAND TO QUERY WHOIS DB 
     HOST = f_lines
     print "QUERY: %s " % (HOST)
@@ -93,7 +100,14 @@ def WHOIS(dnsname):
     output = output.split('\n')				# split each line of string output by '\n'
 
 
-    # EXTRACT SPECIFIC INFORMATION FROM WHOIS OUTPUT 
+
+    # APPEND ALL WHOIS INFO INCLUDING BANNERS (e.g: use for reports)
+    for a_lines in (output):
+      a_whois.append(a_lines)
+
+
+
+    # EXTRACT SPECIFIC INFORMATION FROM WHOIS OUTPUT EXCLUDING BANNERS (e.g: use for DB storage)
     info = []
     for o_lines in (output):
 	  if re.search(r"^Domain", o_lines):		# search(pattern,string)
@@ -113,15 +127,17 @@ def WHOIS(dnsname):
 	  if re.search(r"^Name", o_lines):
 	    info.append(o_lines)
 
-
     # SHOW END RESULT FROM WHOIS OUTPUT
-    for i_lines in (info):
-  	  print i_lines
+    for i_lines in (info):						
+      #print i_lines
+      i_whois.append(i_lines)
 
 
     print "\n------SLEEPING 5 sec-------------\n"
     time.sleep(5)			# sleep required otherwise new query cant be spawned
 
+
+  return (a_whois, i_whois)			# return information 
 
 
 
@@ -190,19 +206,27 @@ def main():
     print '[+] Creating SQL DB:' 
 
 
+  
   '''
   CHECK_FILES()				# Check all necessary files exist before running program
   dnsname = DOMAIN()		# strip urls and only get domain name (e.g: example.com)
-  #WHOIS(dnsname) 			# run whois against domain name
+  WHOIS(dnsname) 			# run whois against domain name
   ipaddr=IPDNS(dnsname)		# return ip addresses
   #URLHEADER()				# get header for each url link 
   #GEOIP(ipaddr)				# get geo location against each url link
   '''
 
 
-  
+
+  dnsname = DOMAIN()
+  #(a_whois, i_whois)=WHOIS(dnsname)
+  ipaddr=IPDNS(dnsname)
 
 
+  #for i in a_whois:
+  #  print i 
+  print dnsname
+  print ipaddr
 
 
 if __name__ == '__main__':
