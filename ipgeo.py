@@ -70,7 +70,7 @@ def DOMAIN():
   for f_lines in open('sites','r').readlines():
 
     # ISOLATE DOMAIN FROM URL EXTRAS 
-    f_lines = f_lines.replace("http://","")	# remove http:// from url 
+    f_lines = f_lines.replace("http://","")	    # remove http:// from url 
     f_lines = f_lines.replace("https://","")	# remove https:// from url 
     f_lines = f_lines.replace("www.","")		# remove www. from url
     f_lines = (f_lines).split('/')[0]			# remove everything after domain
@@ -156,20 +156,25 @@ def IPDNS(dnsname):
 
 
 def URLHEADER():
+  header = []								# create empty array list
   for f_lines in open('sites','r').readlines():
-    f_lines = f_lines.rstrip()
-    print f_lines
+    f_lines = (f_lines).split('//',1)				# remove everything after domain
+    f_lines = f_lines[0] + '//' + f_lines[1].split('/',1)[0]  # extract domainname with http://
+    f_lines = f_lines.strip('\n')					# remove newline
+    #print f_lines
     try:
       response = urllib2.urlopen(f_lines, timeout=10)
-      print response.info()
+      #print response.info()
+      header.append(response.info())
       response.close()
     except urllib2.URLError, e:
       print "There was an error in reading url header: %s" % e
 
-
+  return (header)
 
 
 def GEOIP(ipaddr):
+  i_geo = []						# setup empty array list
   for ip in ipaddr:
 	match = geolite2.lookup(ip)
 	print match.ip					# ip address
@@ -220,13 +225,25 @@ def main():
 
   dnsname = DOMAIN()
   #(a_whois, i_whois)=WHOIS(dnsname)
-  ipaddr=IPDNS(dnsname)
+  #ipaddr=IPDNS(dnsname)
+  header=URLHEADER() 
 
 
   #for i in a_whois:
   #  print i 
-  print dnsname
-  print ipaddr
+
+  #print "\n----\n"
+
+  #for i in range(0,len(dnsname)):
+  #  print dnsname[i], ipaddr[i]
+
+  #print "\n----\n"
+
+  #for i in header:
+  #  print i 
+  #  print "\n----\n"
+
+
 
 
 if __name__ == '__main__':
