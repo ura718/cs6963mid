@@ -176,16 +176,23 @@ def URLHEADER():
 def GEOIP(ipaddr):
   i_geo = []						# setup empty array list
   for ip in ipaddr:
-	match = geolite2.lookup(ip)
-	print match.ip					# ip address
-	print match.country				# country code as ISO
-	print match.continent			# continent code as ISO
-	print match.timezone			# timezone if available as tzinfo name
-	print match.subdivisions		# list of ISO codes as immutable set
-	print match.location			# latitude and longitude tuples
-	print '\n'
+    match = geolite2.lookup(ip)
+    print match.ip					# ip address
+    i_geo.append(match.ip)
+    print match.country				# country code as ISO
+    i_geo.append(match.country)
+    print match.continent			# continent code as ISO
+    i_geo.append(match.continent)
+    print match.timezone			# timezone if available as tzinfo name
+    i_geo.append(match.timezone)
+    print match.subdivisions		# list of ISO codes as immutable set
+    i_geo.append(match.subdivisions)
+    print match.location			# latitude and longitude tuples
+    i_geo.append(match.subdivisions)
+    print '\n'
+    i_geo.append('\n')
 
-  
+  return i_geo 
 
 
 
@@ -225,8 +232,9 @@ def main():
 
   dnsname = DOMAIN()
   #(a_whois, i_whois)=WHOIS(dnsname)
-  #ipaddr=IPDNS(dnsname)
-  header=URLHEADER() 
+  ipaddr=IPDNS(dnsname)
+  #header=URLHEADER() 
+  geoloc=GEOIP(ipaddr)
 
 
   #for i in a_whois:
@@ -237,11 +245,14 @@ def main():
   #for i in range(0,len(dnsname)):
   #  print dnsname[i], ipaddr[i]
 
-  #print "\n----\n"
+  print "\n----\n"
 
   #for i in header:
   #  print i 
   #  print "\n----\n"
+
+  for i in geoloc:
+    print i
 
 
 
