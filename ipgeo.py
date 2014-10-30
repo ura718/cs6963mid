@@ -94,7 +94,7 @@ def WHOIS(dnsname):
   for f_lines in dnsname:
     # RUN SHELL COMMAND TO QUERY WHOIS DB 
     HOST = f_lines
-    print "QUERY: %s " % (HOST)
+    #print "QUERY: %s " % (HOST)
     p = subprocess.Popen(['whois %s' % (str(HOST))], shell=True, stdout=subprocess.PIPE)
     output, err = p.communicate()
     output = output.split('\n')				# split each line of string output by '\n'
@@ -150,7 +150,7 @@ def IPDNS(dnsname):
     # GET IP FROM HOSTNAME 
     IP = socket.gethostbyname(f_lines)		# get hostname ip address
     ipaddr.append(IP)
-    print "%s : %s " % (f_lines,IP)
+    #print "%s : %s " % (f_lines,IP)
 
   return ipaddr
 
@@ -177,19 +177,19 @@ def GEOIP(ipaddr):
   i_geo = []						# setup empty array list
   for ip in ipaddr:
     match = geolite2.lookup(ip)
-    print match.ip					# ip address
+    #print match.ip					# ip address
     i_geo.append(match.ip)
-    print match.country				# country code as ISO
+    #print match.country				# country code as ISO
     i_geo.append(match.country)
-    print match.continent			# continent code as ISO
+    #print match.continent			# continent code as ISO
     i_geo.append(match.continent)
-    print match.timezone			# timezone if available as tzinfo name
+    #print match.timezone			# timezone if available as tzinfo name
     i_geo.append(match.timezone)
-    print match.subdivisions		# list of ISO codes as immutable set
+    #print match.subdivisions		# list of ISO codes as immutable set
     i_geo.append(match.subdivisions)
-    print match.location			# latitude and longitude tuples
+    #print match.location			# latitude and longitude tuples
     i_geo.append(match.subdivisions)
-    print '\n'
+    #print '\n'
     i_geo.append('\n')
 
   return i_geo 
@@ -205,7 +205,8 @@ def main():
   args=parser.parse_args()
 
   if args.r == None:
-	print '[-] Creating Reports File'
+    f_report=None
+    print '[-] Creating Reports File'
   elif args.r:
     f_report = args.r
     print '[+] Creating Reports File: %s' % f_report
@@ -217,8 +218,13 @@ def main():
   elif args.d:
     print '[+] Creating SQL DB:' 
 
+  if f_report:
+    ''' '''
+  elif f_report == None:
+    ''' '''
+ 
 
-  
+ 
   '''
   CHECK_FILES()				# Check all necessary files exist before running program
   dnsname = DOMAIN()		# strip urls and only get domain name (e.g: example.com)
@@ -230,11 +236,11 @@ def main():
 
 
 
-  dnsname = DOMAIN()
+  #dnsname = DOMAIN()
   #(a_whois, i_whois)=WHOIS(dnsname)
-  ipaddr=IPDNS(dnsname)
+  #ipaddr=IPDNS(dnsname)
   #header=URLHEADER() 
-  geoloc=GEOIP(ipaddr)
+  #geoloc=GEOIP(ipaddr)
 
 
   #for i in a_whois:
@@ -251,9 +257,10 @@ def main():
   #  print i 
   #  print "\n----\n"
 
-  for i in geoloc:
-    print i
+  #for i in geoloc:
+  #  print i
 
+  
 
 
 
