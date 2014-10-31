@@ -1,4 +1,5 @@
 #!/usr/bin/python
+# -*- coding: utf-8 -*-
 
 #
 # Author: Yuri Medvinsky
@@ -218,7 +219,7 @@ def addtoDB(f_db, i_data):
   # INSERT i_data INTO DB
   try:
     conn = sqlite3.connect(f_db)
-    conn.execute("INSERT INTO mydata (DATA) VALUES(?)", (str(i_data),)) # NOTE: Need comma ',' after i_data
+    conn.execute("INSERT INTO mydata (DATA) VALUES(?)", (str(i_data).decode('utf-8'),)) # NOTE: Need comma ',' after i_data
     conn.commit()
     conn.close()
   except:
