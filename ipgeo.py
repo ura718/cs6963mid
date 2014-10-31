@@ -167,10 +167,8 @@ def URLHEADER():
     f_lines = (f_lines).split('//',1)				# remove everything after domain
     f_lines = f_lines[0] + '//' + f_lines[1].split('/',1)[0]  # extract domainname with http://
     f_lines = f_lines.strip('\n')					# remove newline
-    #print f_lines
     try:
       response = urllib2.urlopen(f_lines, timeout=10)
-      #print response.info()
       header.append(response.info())
       response.close()
     except urllib2.URLError, e:
@@ -186,19 +184,12 @@ def GEOIP(ipaddr):
   i_geo = []						# setup empty array list
   for ip in ipaddr:
     match = geolite2.lookup(ip)
-    #print match.ip					# ip address
-    i_geo.append(match.ip)
-    #print match.country				# country code as ISO
-    i_geo.append(match.country)
-    #print match.continent			# continent code as ISO
-    i_geo.append(match.continent)
-    #print match.timezone			# timezone if available as tzinfo name
-    i_geo.append(match.timezone)
-    #print match.subdivisions		# list of ISO codes as immutable set
-    i_geo.append(match.subdivisions)
-    #print match.location			# latitude and longitude tuples
-    i_geo.append(match.location)
-    #print '\n'
+    i_geo.append(match.ip)			# ip address
+    i_geo.append(match.country)		# country code as ISO
+    i_geo.append(match.continent)	# continent code as ISO
+    i_geo.append(match.timezone)	# timezone if available as tzinfo name
+    i_geo.append(match.subdivisions)# list of ISO codes as immutable set
+    i_geo.append(match.location)	# latitude and longitude tuples
     i_geo.append('\n')
 
   return i_geo 
@@ -280,7 +271,7 @@ def main():
         print i
         fo.write(i)
         fo.write('\n')
-      fo.write("-"*70 + '\n')
+      fo.write("-"*70 + '\n')		# write 70 dashes + newline to file
     except IOError, e:
  	  print 'Cant append to reports file: %s ' % e
 	  exit(1)
@@ -294,7 +285,7 @@ def main():
   ''' RUN IPDNS '''
 
   # APPEND ipaddr TO REPORT FILE 
-  ipaddr=IPDNS(dnsname)			# return ip addresses
+  ipaddr=IPDNS(dnsname)				# return ip addresses
 
   if f_report == None:
     for i in range(0,len(dnsname)):
@@ -306,7 +297,7 @@ def main():
         print dnsname[i] + ' : ' + ipaddr[i]
         fo.write(dnsname[i] + ' : ' + ipaddr[i])
         fo.write('\n')
-      fo.write("-"*70 + '\n')
+      fo.write("-"*70 + '\n')		# write 70 dashes + newline to file
     except IOError, e:
  	  print 'Cant append to reports file: %s ' % e
 	  exit(1)
@@ -331,7 +322,7 @@ def main():
         print i
         fo.write(str(i))
         fo.write('\n')
-      fo.write("-"*70 + '\n')
+      fo.write("-"*70 + '\n')		# write 70 dashes + newline to file
     except IOError, e:
  	  print 'Cant append to reports file: %s ' % e
 	  exit(1)
@@ -356,7 +347,7 @@ def main():
         print i
         fo.write(str(i))
         fo.write('\n')
-      fo.write("-"*70 + '\n')
+      fo.write("-"*70 + '\n')		# write 70 dashes + newline to file
     except IOError, e:
  	  print 'Cant append to reports file: %s ' % e
 	  exit(1)
