@@ -252,6 +252,7 @@ def main():
         print i
         fo.write(i)
         fo.write('\n')
+      fo.write("-"*70 + '\n')
     except IOError, e:
  	  print 'Cant append reports file: %s ' % e
 	  exit(1)
@@ -279,6 +280,7 @@ def main():
         print i
         fo.write(i)
         fo.write('\n')
+      fo.write("-"*70 + '\n')
     except IOError, e:
  	  print 'Cant append to reports file: %s ' % e
 	  exit(1)
@@ -304,6 +306,7 @@ def main():
         print dnsname[i] + ' : ' + ipaddr[i]
         fo.write(dnsname[i] + ' : ' + ipaddr[i])
         fo.write('\n')
+      fo.write("-"*70 + '\n')
     except IOError, e:
  	  print 'Cant append to reports file: %s ' % e
 	  exit(1)
@@ -328,6 +331,7 @@ def main():
         print i
         fo.write(str(i))
         fo.write('\n')
+      fo.write("-"*70 + '\n')
     except IOError, e:
  	  print 'Cant append to reports file: %s ' % e
 	  exit(1)
@@ -352,6 +356,7 @@ def main():
         print i
         fo.write(str(i))
         fo.write('\n')
+      fo.write("-"*70 + '\n')
     except IOError, e:
  	  print 'Cant append to reports file: %s ' % e
 	  exit(1)
