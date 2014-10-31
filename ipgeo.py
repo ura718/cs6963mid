@@ -94,7 +94,7 @@ def WHOIS(dnsname):
   for f_lines in dnsname:
     # RUN SHELL COMMAND TO QUERY WHOIS DB 
     HOST = f_lines
-    #print "QUERY: %s " % (HOST)
+    print "QUERY: %s " % (HOST)
     p = subprocess.Popen(['whois %s' % (str(HOST))], shell=True, stdout=subprocess.PIPE)
     output, err = p.communicate()
     output = output.split('\n')				# split each line of string output by '\n'
@@ -110,22 +110,24 @@ def WHOIS(dnsname):
     # EXTRACT SPECIFIC INFORMATION FROM WHOIS OUTPUT EXCLUDING BANNERS (e.g: use for DB storage)
     info = []
     for o_lines in (output):
-	  if re.search(r"^Domain", o_lines):		# search(pattern,string)
-	    info.append(o_lines)
-	  if re.search(r"^Updated", o_lines):
-	    info.append(o_lines)
-	  if re.search(r"^Created", o_lines):
-	    info.append(o_lines)
-	  if re.search(r"^Admin", o_lines):
-	    info.append(o_lines)
-	  if re.search(r"^Registrar", o_lines):
-	    info.append(o_lines)
-	  if re.search(r"^Registrant", o_lines):
-	    info.append(o_lines)
-	  if re.search(r"^Tech", o_lines):
-	    info.append(o_lines)
-	  if re.search(r"^Name", o_lines):
-	    info.append(o_lines)
+      if re.search(r"^Domain", o_lines):		# search(pattern,string)
+        info.append(o_lines)
+      if re.search(r"^Updated", o_lines):
+        info.append(o_lines)
+      if re.search(r"^Created", o_lines):
+        info.append(o_lines)
+      if re.search(r"^Admin", o_lines):
+        info.append(o_lines)
+      if re.search(r"^Registrar", o_lines):
+        info.append(o_lines)
+      if re.search(r"^Registrant", o_lines):
+        info.append(o_lines)
+      if re.search(r"^Tech", o_lines):
+        info.append(o_lines)
+      if re.search(r"^Name", o_lines):
+        info.append(o_lines)
+
+    info.append('\n')
 
     # SHOW END RESULT FROM WHOIS OUTPUT
     for i_lines in (info):						
@@ -142,6 +144,7 @@ def WHOIS(dnsname):
 
 
 
+
 def IPDNS(dnsname):
   ipaddr = []								# create empty array
   # Loop over each item in dnsnames
@@ -153,6 +156,9 @@ def IPDNS(dnsname):
     #print "%s : %s " % (f_lines,IP)
 
   return ipaddr
+
+
+
 
 
 def URLHEADER():
@@ -173,6 +179,9 @@ def URLHEADER():
   return (header)
 
 
+
+
+
 def GEOIP(ipaddr):
   i_geo = []						# setup empty array list
   for ip in ipaddr:
@@ -188,11 +197,12 @@ def GEOIP(ipaddr):
     #print match.subdivisions		# list of ISO codes as immutable set
     i_geo.append(match.subdivisions)
     #print match.location			# latitude and longitude tuples
-    i_geo.append(match.subdivisions)
+    i_geo.append(match.location)
     #print '\n'
     i_geo.append('\n')
 
   return i_geo 
+
 
 
 
@@ -204,6 +214,8 @@ def main():
   parser.add_argument('-d', help='Create SQL DB')
   args=parser.parse_args()
 
+
+  # OPTION FOR GENERATING REPORTS
   if args.r == None:
     f_report=None
     print '[-] Creating Reports File'
@@ -218,47 +230,133 @@ def main():
   elif args.d:
     print '[+] Creating SQL DB:' 
 
-  if f_report:
-    ''' '''
-  elif f_report == None:
-    ''' '''
  
 
  
-  '''
-  CHECK_FILES()				# Check all necessary files exist before running program
-  dnsname = DOMAIN()		# strip urls and only get domain name (e.g: example.com)
-  WHOIS(dnsname) 			# run whois against domain name
-  ipaddr=IPDNS(dnsname)		# return ip addresses
-  #URLHEADER()				# get header for each url link 
-  #GEOIP(ipaddr)				# get geo location against each url link
-  '''
 
 
 
-  #dnsname = DOMAIN()
-  #(a_whois, i_whois)=WHOIS(dnsname)
-  #ipaddr=IPDNS(dnsname)
-  #header=URLHEADER() 
-  #geoloc=GEOIP(ipaddr)
+
+  ''' RUN DNSNAME '''
+
+  dnsname=DOMAIN()				# strip urls and only get domain name (e.g: example.com)
+
+  # APPEND dnsnames TO REPORT FILE
+  if f_report == None:  
+    for i in dnsname:
+      print i
+  elif f_report:
+    try: 
+      fo = open(f_report,'a')
+      for i in dnsname:
+        print i
+        fo.write(i)
+        fo.write('\n')
+    except IOError, e:
+ 	  print 'Cant append reports file: %s ' % e
+	  exit(1)
+    else:
+      fo.close()
+
+  
+  print "\n---------------------------------\n"
 
 
-  #for i in a_whois:
-  #  print i 
 
-  #print "\n----\n"
 
-  #for i in range(0,len(dnsname)):
-  #  print dnsname[i], ipaddr[i]
+  ''' RUN WHOIS '''
 
-  print "\n----\n"
+  (a_whois, i_whois)=WHOIS(dnsname) # run whois against domain name
 
-  #for i in header:
-  #  print i 
-  #  print "\n----\n"
+  # APPEND a_whois TO REPORT FILE OR PRINT i_whois TO SCREEN
+  if f_report == None:
+    for i in i_whois:
+      print i 
+  elif f_report:
+    try: 
+      fo = open(f_report,'a')
+      for i in a_whois:
+        print i
+        fo.write(i)
+        fo.write('\n')
+    except IOError, e:
+ 	  print 'Cant append to reports file: %s ' % e
+	  exit(1)
+    else:
+      fo.close()
+  
 
-  #for i in geoloc:
-  #  print i
+
+  print "\n---------------------------------\n"
+
+  ''' RUN IPDNS '''
+
+  # APPEND ipaddr TO REPORT FILE 
+  ipaddr=IPDNS(dnsname)			# return ip addresses
+
+  if f_report == None:
+    for i in range(0,len(dnsname)):
+      print dnsname[i] + ' : ' + ipaddr[i]
+  elif f_report:
+    try: 
+      fo = open(f_report,'a')
+      for i in range(0,len(dnsname)):
+        print dnsname[i] + ' : ' + ipaddr[i]
+        fo.write(dnsname[i] + ' : ' + ipaddr[i])
+        fo.write('\n')
+    except IOError, e:
+ 	  print 'Cant append to reports file: %s ' % e
+	  exit(1)
+    else:
+      fo.close()
+
+
+
+
+  print "\n---------------------------------\n"
+
+  # APPEND HEADER TO REPORT FILE 
+  header=URLHEADER() 				# get header for each url link 
+
+  if f_report == None:
+    for i in header:
+      print i
+  elif f_report:
+    try: 
+      fo = open(f_report,'a')
+      for i in header:
+        print i
+        fo.write(str(i))
+        fo.write('\n')
+    except IOError, e:
+ 	  print 'Cant append to reports file: %s ' % e
+	  exit(1)
+    else:
+      fo.close()
+
+
+
+
+  print "\n---------------------------------\n"
+
+  # APPEND GEOLOC TO REPORT FILE
+  geoloc=GEOIP(ipaddr)				# get geo location against each url link
+  
+  if f_report == None:
+    for i in geoloc:
+      print i
+  elif f_report:
+    try: 
+      fo = open(f_report,'a')
+      for i in geoloc:
+        print i
+        fo.write(str(i))
+        fo.write('\n')
+    except IOError, e:
+ 	  print 'Cant append to reports file: %s ' % e
+	  exit(1)
+    else:
+      fo.close()
 
   
 
