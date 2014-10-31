@@ -13,9 +13,10 @@
 #   install module python-geoip
 
 
-import argparse
-import urllib2
 import subprocess
+import argparse
+import sqlite3
+import urllib2
 import socket
 import time
 import sys
@@ -197,6 +198,35 @@ def GEOIP(ipaddr):
 
 
 
+def sqlDB(f_db):
+  try:
+    conn = sqlite3.connect(f_db)
+    cursor = conn.cursor()
+    cursor.execute("DROP TABLE IF EXISTS mydata")
+    cursor.execute("CREATE TABLE mydata(DATA text)")
+    conn.commit()
+    conn.close()
+  except sqlite3.OperationalError, e:
+    print "Database already exists"
+    pass
+
+
+
+
+
+def addtoDB(f_db, i_data):
+  # INSERT i_data INTO DB
+  try:
+    conn = sqlite3.connect(f_db)
+    conn.execute("INSERT INTO mydata (DATA) VALUES(?)", (str(i_data),)) # NOTE: Need comma ',' after i_data
+    conn.commit()
+    conn.close()
+  except:
+    raise
+
+
+
+
 
 def main():
   # Help Menu
@@ -217,9 +247,12 @@ def main():
 
 
   if args.d == None:
-  	print '[-] Creating SQL DB'
+    f_db=None
+    print '[-] Creating SQL DB'
   elif args.d:
-    print '[+] Creating SQL DB:' 
+    f_db = args.d
+    sqlDB(f_db)
+    print '[+] Creating SQL DB: %s' % f_db 
 
  
 
@@ -250,6 +283,18 @@ def main():
     else:
       fo.close()
 
+
+
+  # INSERT dnsnames INTO DATABASE
+  if f_db == None:
+    pass
+  elif f_db:
+    for i_data in dnsname:
+      addtoDB(f_db, i_data)
+
+
+
+
   
   print "\n---------------------------------\n"
 
@@ -277,10 +322,27 @@ def main():
 	  exit(1)
     else:
       fo.close()
-  
+ 
+
+
+ 
+  # INSERT i_whois INTO DATABASE
+  if f_db == None:
+    pass
+  elif f_db:
+    for i_data in i_whois:
+      addtoDB(f_db, i_data)
+
+
+
+
+
 
 
   print "\n---------------------------------\n"
+
+
+
 
   ''' RUN IPDNS '''
 
@@ -307,7 +369,27 @@ def main():
 
 
 
+
+
+  # INSERT ipaddr INTO DATABASE
+  if f_db == None:
+    pass
+  elif f_db:
+    for i_data in range(0,len(dnsname)):
+      addtoDB(f_db, i_data=dnsname[i_data] + ' : ' + ipaddr[i_data])
+
+
+
+
+
+
+
+
   print "\n---------------------------------\n"
+
+
+
+
 
   # APPEND HEADER TO REPORT FILE 
   header=URLHEADER() 				# get header for each url link 
@@ -332,7 +414,22 @@ def main():
 
 
 
+
+  # INSERT HEADER INTO DATABASE
+  if f_db == None:
+    pass
+  elif f_db:
+    for i_data in header:
+      addtoDB(f_db, i_data)
+
+
+
+
+
   print "\n---------------------------------\n"
+
+
+
 
   # APPEND GEOLOC TO REPORT FILE
   geoloc=GEOIP(ipaddr)				# get geo location against each url link
@@ -354,7 +451,18 @@ def main():
     else:
       fo.close()
 
+
+
+
   
+  # INSERT GEOLOC INTO DATABASE
+  if f_db == None:
+    pass
+  elif f_db:
+    for i_data in geoloc:
+      addtoDB(f_db, i_data)
+
+
 
 
 
