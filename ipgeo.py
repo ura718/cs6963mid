@@ -15,6 +15,7 @@
 
 
 import subprocess
+import simplekml
 import argparse
 import sqlite3
 import urllib2
@@ -183,7 +184,8 @@ def URLHEADER():
 
 
 def GEOIP(ipaddr):
-  i_geo = []						# setup empty array list
+  i_geo = []						# setup empty array list for all geo
+  i_coord = []						# setup empty array list for coordinates
   for ip in ipaddr:
     match = geolite2.lookup(ip)
     i_geo.append(match.ip)			# ip address
@@ -192,9 +194,10 @@ def GEOIP(ipaddr):
     i_geo.append(match.timezone)	# timezone if available as tzinfo name
     i_geo.append(match.subdivisions)# list of ISO codes as immutable set
     i_geo.append(match.location)	# latitude and longitude tuples
+    i_coord.append(match.location)	# latitude and longitude tuples used for kml file
     i_geo.append('\n')
 
-  return i_geo 
+  return (i_geo, i_coord)
 
 
 
@@ -234,6 +237,7 @@ def main():
   parser = argparse.ArgumentParser()
   parser.add_argument('-r', help='Create Report File')
   parser.add_argument('-d', help='Create SQL DB')
+  parser.add_argument('-k', help='Create KML file')
   args=parser.parse_args()
 
 
@@ -256,6 +260,12 @@ def main():
     print '[+] Creating SQL DB: %s' % f_db 
 
  
+  if args.k == None:
+    f_kml=None
+    print '[-] Creating KML File'
+  elif args.k:
+    f_kml = args.k
+    print '[+] Creating KML File: %s' % f_kml
 
  
 
@@ -433,7 +443,7 @@ def main():
 
 
   # APPEND GEOLOC TO REPORT FILE
-  geoloc=GEOIP(ipaddr)				# get geo location against each url link
+  (geoloc,coord)=GEOIP(ipaddr)				# get geo location against each url link
   
   if f_report == None:
     for i in geoloc:
@@ -462,6 +472,22 @@ def main():
   elif f_db:
     for i_data in geoloc:
       addtoDB(f_db, i_data)
+
+
+  
+  # CREATE KML FILE
+  if f_kml == None:
+    pass
+  elif f_kml:
+    try: 
+      kml=simplekml.Kml()
+      for i in range(0,len(dnsname)):
+        lat, lon = coord[i]
+        kml.newpoint(name=dnsname[i], coords=[(lat,lon)])
+      kml.save(f_kml)
+    except:
+      raise
+  
 
 
 
